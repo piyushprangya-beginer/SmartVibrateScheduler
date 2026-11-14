@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#121318">
+
+    <!-- Top App Bar -->
+    <TextView
+        android:id="@+id/tvAppHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1E2028"
+        android:padding="16dp"
+        android:text="Smart Vibrate Scheduler"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Main Content Area (Holds all 4 Tabs) -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- ================= TAB 1: TIMELINE (LEFT-MOST) ================= -->
+        <ScrollView
+            android:id="@+id/tabTimeline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvActiveSemesterInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#252836"
+                    android:padding="16dp"
+                    android:text="No Active Semester"
+                    android:textColor="#90CAF9"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Semester Setup (One-Time Scan)"
+                    android:textColor="#B0BEC5"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etSemesterName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Semester Name (e.g., Fall 2026)"
+                    android:text="Fall 2026"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#78909C" />
+
+                <EditText
+                    android:id="@+id/etSemesterEndDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Semester End Date (YYYY-MM-DD)"
+                    android:text="2026-12-20"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#78909C" />
+
+                <Button
+                    android:id="@+id/btnScanNewSemester"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="#1E88E5"
+                    android:text="📷 SCAN NEW TIMETABLE"
+                    android:textColor="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/btnRescanOverwrite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#37474F"
+                    android:text="🔄 RE-SCAN &amp; OVERWRITE CURRENT"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Peer-to-Peer Batch Sharing"
+                    android:textColor="#B0BEC5"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvShareCodeDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="#1E2028"
+                    android:padding="12dp"
+                    android:text="Scan or create a semester to generate Share Code"
+                    android:textColor="#80CBC4"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnCopyShareCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#00897B"
+                    android:text="📤 COPY / SHARE TIMETABLE CODE"
+                    android:textColor="#FFFFFF" />
+
+                <EditText
+                    android:id="@+id/etImportCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="Paste Friend's Share Code (RPCAU-...)"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#78909C" />
+
+                <Button
+                    android:id="@+id/btnImportCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#5E35B1"
+                    android:text="📥 IMPORT VIA CODE"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= TAB 2: DASHBOARD (DEFAULT HOME) ================= -->
+        <ScrollView
+            android:id="@+id/tabDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Status & Live Countdown Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#1B3B2B"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvCurrentModeStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🔔 Normal Mode (Ringing)"
+                        android:textColor="#81C784"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="NEXT EVENT IN"
+                        android:textColor="#B0BEC5"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvCountdownTimer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="00:00:00"
+                        android:textColor="#FFFFFF"
+                        android:textSize="34sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvNextEventSubtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="No upcoming classes remaining today"
+                        android:textColor="#E0E0E0"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Empty State Prompt (Shown on Day 1) -->
+                <LinearLayout
+                    android:id="@+id/cardEmptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="#252836"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="No Active Semester Found"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnEmptyGoToTimeline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="#1E88E5"
+                        android:text="Tap Here to Scan or Import Timetable"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvTodayDateHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Today's Schedule"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/containerTodayEvents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical" />
+
+                <Button
+                    android:id="@+id/btnQuickAddToday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#1E88E5"
+                    android:text="＋ ADD ONE-OFF EVENT TODAY"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= TAB 3: CALENDAR DRILL-DOWN ================= -->
+        <ScrollView
+            android:id="@+id/tabCalendar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <CalendarView
+                    android:id="@+id/calendarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#1E2028" />
+
+                <!-- Day Drill-Down Panel -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="#252836"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvSelectedDateTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Selected Date"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnMarkHoliday"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="#C62828"
+                        android:text="🔕 Mark Entire Day as Holiday"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnRestoreHoliday"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:backgroundTint="#37474F"
+                        android:text="🔄 Restore Day from 7-Day Template"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnAddEventOnDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:backgroundTint="#1E88E5"
+                        android:text="＋ Add Custom Event on This Date"
+                        android:textColor="#FFFFFF" />
+
+                    <LinearLayout
+                        android:id="@+id/containerDateEvents"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= TAB 4: SMART BRAIN ================= -->
+        <ScrollView
+            android:id="@+id/tabBrain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Hostel Safe Zone Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#252836"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🛡️ Hostel Safe Zone Status"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvSafeZoneStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Learned Wi-Fi: Not Set Yet (3:00 AM Auto-Scan Active)"
+                        android:textColor="#80CBC4"
+                        android:textSize="14sp" />
+
+                    <Switch
+                        android:id="@+id/switchAutoMidnightScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:checked="true"
+                        android:text="Autonomous 3:00 AM Midnight Scan"
+                        android:textColor="#FFFFFF" />
+
+                    <Switch
+                        android:id="@+id/switchOverrideSafeZone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:checked="false"
+                        android:text="Disable Safe Zone (Mute Even in Hostel)"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnForceSafeZoneNow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:backgroundTint="#1E88E5"
+                        android:text="📶 Lock Current Wi-Fi as Safe Zone Now"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <!-- System Health Check Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="#252836"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚙️ System Health Check"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvHealthStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Checking permissions..."
+                        android:textColor="#FFF59D"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btnGrantDnd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="#37474F"
+                        android:text="1. Grant Do Not Disturb (Ringer Control)"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnGrantBattery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:backgroundTint="#37474F"
+                        android:text="2. Bypass Battery Optimization"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnGrantPermissions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:backgroundTint="#37474F"
+                        android:text                        android:text="3. Grant Camera &amp; Wi-Fi Location Access"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- Bottom Navigation Bar (Timeline | Dashboard | Calendar | Brain) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#1E2028"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <Button
+            android:id="@+id/btnNavTimeline"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="🕒\nTimeline"
+            android:textAllCaps="false"
+            android:textColor="#90A4AE"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btnNavDashboard"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="🏠\nDashboard"
+            android:textAllCaps="false"
+            android:textColor="#64B5F6"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btnNavCalendar"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="📅\nCalendar"
+            android:textAllCaps="false"
+            android:textColor="#90A4AE"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btnNavBrain"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="🧠\nBrain"
+            android:textAllCaps="false"
+            android:textColor="#90A4AE"
+            android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>
