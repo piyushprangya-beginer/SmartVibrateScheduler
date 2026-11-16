@@ -447,8 +447,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:backgroundTint="#37474F"
-                        android:text                        android:text="3. Grant Camera &amp; Wi-Fi Location Access"
+                        android:backgroundTint="#37474F"                        android:text="3. Grant Camera &amp; Wi-Fi Location Access"
                         android:textColor="#FFFFFF" />
                 </LinearLayout>
             </LinearLayout>
