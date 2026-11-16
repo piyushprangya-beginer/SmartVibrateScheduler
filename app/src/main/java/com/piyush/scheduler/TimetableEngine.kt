@@ -46,9 +46,9 @@ object TimetableEngine {
         )
         val timeRegex = Regex("""(\d{1,2})[:.](\d{2})""")
 
-        val dayLocations = mutableMapOf<Int, Pair<Int, Int>>() // dayOfWeek -> (X, Y)
-        val timeLocations = mutableListOf<Triple<String, Int, Int>>() // (HH:mm, X, Y)
-        val classBlocks = mutableListOf<Triple<String, Int, Int>>() // (Title, X, Y)
+        val dayLocations = mutableMapOf<Int, Pair<Int, Int>>()
+        val timeLocations = mutableListOf<Triple<String, Int, Int>>()
+        val classBlocks = mutableListOf<Triple<String, Int, Int>>()
 
         for (block in visionText.textBlocks) {
             for (line in block.lines) {
@@ -78,7 +78,6 @@ object TimetableEngine {
             }
         }
 
-        // Map detected subjects to the closest Day and Time headers
         for ((title, cx, cy) in classBlocks) {
             val closestDay = dayLocations.minByOrNull { (_, pos) ->
                 abs(cx - pos.first) + abs(cy - pos.second) / 2
@@ -94,6 +93,7 @@ object TimetableEngine {
 
             results.add(
                 TemplateEvent(
+                    templateId = 0,
                     semesterId = 1,
                     dayOfWeek = closestDay,
                     title = title,
@@ -103,11 +103,10 @@ object TimetableEngine {
             )
         }
 
-        // Fallback starter blocks if the photo was blurry, allowing easy manual verification
         if (results.isEmpty()) {
-            results.add(TemplateEvent(0, 1, "Agronomy Class", "08:00", "10:00"))
-            results.add(TemplateEvent(0, 1, "Agronomy Lab", "10:00", "12:00"))
-            results.add(TemplateEvent(0, 2, "Crop Lab", "01:00", "02:30"))
+            results.add(TemplateEvent(0, 1, 1, "Agronomy Class", "08:00", "10:00"))
+            results.add(TemplateEvent(0, 1, 1, "Agronomy Lab", "10:00", "12:00"))
+            results.add(TemplateEvent(0, 1, 2, "Crop Lab", "01:00", "02:30"))
         }
 
         return results
@@ -156,7 +155,7 @@ object TimetableEngine {
         val generatedEvents = mutableListOf<ScheduleEvent>()
         var cursorDate = effectiveStart
         while (!cursorDate.isAfter(endDate)) {
-            val dayOfWeek = cursorDate.dayOfWeek.value // 1 (Mon) to 7 (Sun)
+            val dayOfWeek = cursorDate.dayOfWeek.value
             val dateStr = cursorDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
             cleanTemplates.filter { it.dayOfWeek == dayOfWeek }.forEach { tmpl ->
@@ -247,6 +246,7 @@ object TimetableEngine {
                 val obj = arr.getJSONObject(i)
                 templates.add(
                     TemplateEvent(
+                        templateId = 0,
                         semesterId = 0,
                         dayOfWeek = obj.getInt("d"),
                         title = obj.getString("t"),

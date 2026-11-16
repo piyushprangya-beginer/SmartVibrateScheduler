@@ -58,7 +58,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Camera launcher for Offline ML Kit Timetable Scan
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -76,11 +75,10 @@ class MainActivity : AppCompatActivity() {
                 }
             )
         } else {
-            // Allows opening the 7-day grid directly even if camera is canceled
             show7DayVerificationDialog(
                 mutableListOf(
-                    TemplateEvent(0, 1, "Agronomy Class", "08:00", "10:00"),
-                    TemplateEvent(0, 1, "Agronomy Lab", "10:00", "12:00")
+                    TemplateEvent(0, 1, 1, "Agronomy Class", "08:00", "10:00"),
+                    TemplateEvent(0, 1, 1, "Agronomy Lab", "10:00", "12:00")
                 )
             )
         }
@@ -96,7 +94,6 @@ class MainActivity : AppCompatActivity() {
         bindCalendarTab()
         bindBrainTab()
 
-        // Start 3:00 AM Safe Zone background learner & evaluate schedule
         CoroutineScope(Dispatchers.IO).launch {
             AutomationEngine.scheduleMidnightScan(this@MainActivity)
             AutomationEngine.evaluateAndScheduleNext(this@MainActivity)
@@ -117,7 +114,6 @@ class MainActivity : AppCompatActivity() {
         timerHandler.removeCallbacks(countdownRunnable)
     }
 
-    // ================= 1. BOTTOM NAVIGATION (OPENS ON DASHBOARD) =================
     private fun bindNavigation() {
         tabTimeline = findViewById(R.id.tabTimeline)
         tabDashboard = findViewById(R.id.tabDashboard)
@@ -134,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         btnNavCalendar.setOnClickListener { switchTab(3) }
         btnNavBrain.setOnClickListener { switchTab(4) }
 
-        switchTab(2) // Launch directly into Dashboard
+        switchTab(2)
     }
 
     private fun switchTab(index: Int) {
@@ -153,7 +149,6 @@ class MainActivity : AppCompatActivity() {
         refreshAllScreens()
     }
 
-    // ================= 2. TIMELINE TAB & 7-DAY OCR VERIFICATION GRID =================
     private fun bindTimelineTab() {
         val btnScanNew = findViewById<Button>(R.id.btnScanNewSemester)
         val btnRescan = findViewById<Button>(R.id.btnRescanOverwrite)
@@ -209,7 +204,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Shows the 7-Day Interactive Verification Grid where user can check/edit OCR results
     private fun show7DayVerificationDialog(templates: MutableList<TemplateEvent>) {
         val dayNames = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val rootLayout = LinearLayout(this).apply {
@@ -235,7 +229,7 @@ class MainActivity : AppCompatActivity() {
                     setTextColor(Color.WHITE)
                 }
                 val btnDel = Button(this).apply {
-                    text = "🗑️"
+                    text = "Delete"
                     setOnClickListener {
                         templates.removeAt(idx)
                         renderGridList()
@@ -250,7 +244,7 @@ class MainActivity : AppCompatActivity() {
         renderGridList()
 
         val btnAddBlock = Button(this).apply {
-            text = "＋ Add Class to 7-Day Grid"
+            text = "+ Add Class to 7-Day Grid"
             setOnClickListener {
                 showAddTemplateBlockDialog { newBlock ->
                     templates.add(newBlock)
@@ -308,7 +302,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    // ================= 3. DASHBOARD TAB & LIVE TIMER =================
     private fun bindDashboardTab() {
         findViewById<Button>(R.id.btnEmptyGoToTimeline).setOnClickListener {
             switchTab(1)
@@ -338,7 +331,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ================= 4. CALENDAR DRILL-DOWN TAB =================
     private fun bindCalendarTab() {
         val calView = findViewById<CalendarView>(R.id.calendarView)
         calView.setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -382,7 +374,7 @@ class MainActivity : AppCompatActivity() {
                 container.removeAllViews()
                 if (events.isEmpty()) {
                     val tvEmpty = TextView(this@MainActivity).apply {
-                        text = "🎉 Holiday / No classes scheduled on this date."
+                        text = "Holiday / No classes scheduled on this date."
                         setTextColor(Color.parseColor("#EF9A9A"))
                         setPadding(8, 12, 8, 12)
                     }
@@ -402,11 +394,11 @@ class MainActivity : AppCompatActivity() {
                         setTextColor(Color.WHITE)
                     }
                     val btnEdit = Button(this@MainActivity).apply {
-                        text = "✏️"
+                        text = "Edit"
                         setOnClickListener { showSingleEventDialog(dateStr, ev) }
                     }
                     val btnDel = Button(this@MainActivity).apply {
-                        text = "🗑️"
+                        text = "Delete"
                         setOnClickListener {
                             CoroutineScope(Dispatchers.IO).launch {
                                 AppDatabase.getDatabase(this@MainActivity).scheduleDao().deleteSingleEvent(ev)
@@ -466,7 +458,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    // ================= 5. SMART BRAIN TAB =================
     private fun bindBrainTab() {
         val prefs = getSharedPreferences("smart_brain_prefs", Context.MODE_PRIVATE)
         val swAuto = findViewById<Switch>(R.id.switchAutoMidnightScan)
@@ -517,13 +508,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ================= 6. MASTER UI SYNC =================
     private fun refreshAllScreens() {
         val todayStr = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
         val nowStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
         val prefs = getSharedPreferences("smart_brain_prefs", Context.MODE_PRIVATE)
 
-        // Update Smart Brain Status
         val learnedWifi = prefs.getString("learned_safe_zone", "Not Learned Yet (Waiting for 3:00 AM Scan)")
         findViewById<TextView>(R.id.tvSafeZoneStatus).text = "Current Safe Zone: $learnedWifi"
 
@@ -533,9 +522,9 @@ class MainActivity : AppCompatActivity() {
         val battOk = pm.isIgnoringBatteryOptimizations(packageName)
         val locOk = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         findViewById<TextView>(R.id.tvHealthStatus).text =
-            "• DND Access: ${if (dndOk) "✅ Granted" else "❌ Missing"}\n" +
-            "• Battery Bypass: ${if (battOk) "✅ Active" else "❌ Restricted"}\n" +
-            "• Wi-Fi & Camera: ${if (locOk) "✅ Granted" else "❌ Missing"}"
+            "- DND Access: ${if (dndOk) "Granted" else "Missing"}\n" +
+            "- Battery Bypass: ${if (battOk) "Active" else "Restricted"}\n" +
+            "- Wi-Fi & Camera: ${if (locOk) "Granted" else "Missing"}"
 
         CoroutineScope(Dispatchers.IO).launch {
             val dao = AppDatabase.getDatabase(this@MainActivity).scheduleDao()
@@ -543,7 +532,6 @@ class MainActivity : AppCompatActivity() {
             val todayEvents = dao.getEventsForDate(todayStr)
 
             withContext(Dispatchers.Main) {
-                // Timeline Header & Share Code
                 val tvSemInfo = findViewById<TextView>(R.id.tvActiveSemesterInfo)
                 val tvShare = findViewById<TextView>(R.id.tvShareCodeDisplay)
                 val cardEmpty = findViewById<LinearLayout>(R.id.cardEmptyState)
@@ -557,9 +545,8 @@ class MainActivity : AppCompatActivity() {
                     cardEmpty.visibility = View.VISIBLE
                 }
 
-                // Dashboard Status & Next Event Calculation
                 findViewById<TextView>(R.id.tvCurrentModeStatus).text =
-                    prefs.getString("current_mode", "🔔 Normal Mode (Ringing)")
+                    prefs.getString("current_mode", "Normal Mode (Ringing)")
                 findViewById<TextView>(R.id.tvTodayDateHeader).text = "Today's Schedule ($todayStr)"
 
                 val nextEv = todayEvents.firstOrNull { it.isEnabled && it.startTime > nowStr }
@@ -573,7 +560,6 @@ class MainActivity : AppCompatActivity() {
                         "No more classes starting today"
                 }
 
-                // Populate Today's Roster with Start/End Times & Toggles
                 val containerToday = findViewById<LinearLayout>(R.id.containerTodayEvents)
                 containerToday.removeAllViews()
 
