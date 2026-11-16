@@ -469,7 +469,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="🕒\nTimeline"
+            android:text="Timeline"
             android:textAllCaps="false"
             android:textColor="#90A4AE"
             android:textSize="11sp" />
@@ -480,7 +480,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="🏠\nDashboard"
+            android:text="Dashboard"
             android:textAllCaps="false"
             android:textColor="#64B5F6"
             android:textSize="11sp" />
@@ -491,7 +491,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="📅\nCalendar"
+            android:text="Calendar"
             android:textAllCaps="false"
             android:textColor="#90A4AE"
             android:textSize="11sp" />
@@ -502,7 +502,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="🧠\nBrain"
+            android:text="Brain"
             android:textAllCaps="false"
             android:textColor="#90A4AE"
             android:textSize="11sp" />
