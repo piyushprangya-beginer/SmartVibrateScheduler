@@ -66,8 +66,8 @@ object TimetableEngine {
 
                 val timeMatch = timeRegex.find(rawText)
                 if (timeMatch != null) {
-                    val h = timeMatch.groupValues[1].padStart(2, '0')
-                    val m = timeMatch.groupValues[2]
+                    val h = (timeMatch.groupValues[1].toIntOrNull() ?: 8).coerceIn(0, 23).toString().padStart(2, '0')
+                    val m = (timeMatch.groupValues[2].toIntOrNull() ?: 0).coerceIn(0, 59).toString().padStart(2, '0')
                     timeLocations.add(Triple("$h:$m", cx, cy))
                     continue
                 }
@@ -103,12 +103,6 @@ object TimetableEngine {
             )
         }
 
-        if (results.isEmpty()) {
-            results.add(TemplateEvent(0, 1, 1, "Agronomy Class", "08:00", "10:00"))
-            results.add(TemplateEvent(0, 1, 1, "Agronomy Lab", "10:00", "12:00"))
-            results.add(TemplateEvent(0, 1, 2, "Crop Lab", "01:00", "02:30"))
-        }
-
         return results
     }
 
@@ -124,18 +118,41 @@ object TimetableEngine {
         val dao = AppDatabase.getDatabase(context).scheduleDao()
         val todayStr = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
 
-        val shareCode = encodeShareCode(semesterName, startDateStr, endDateStr, templates)
+        val safeStartDate = runCatching {
+            LocalDate.parse(startDateStr, DateTimeFormatter.ISO_LOCAL_DATE)
+        }.getOrDefault(LocalDate.now())
+
+        val safeEndDate = runCatching {
+            LocalDate.parse(endDateStr, DateTimeFormatter.ISO_LOCAL_DATE)
+        }.getOrDefault(LocalDate.now().plusMonths(4))
+
+        val finalStartStr = safeStartDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val finalEndStr = if (safeEndDate.isBefore(safeStartDate)) {
+            safeStartDate.plusMonths(4).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        } else {
+            safeEndDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        }
+
+        val shareCode = encodeShareCode(semesterName, finalStartStr, finalEndStr, templates)
 
         val activeSem = dao.getActiveSemester(todayStr)
         val semId: Int = if (isRescanOverwrite && activeSem != null) {
             dao.clearFutureEventsForRescan(activeSem.semesterId, todayStr)
+            dao.clearTemplatesForSemester(activeSem.semesterId)
+            dao.insertSemester(
+                activeSem.copy(
+                    semesterName = semesterName,
+                    endDate = finalEndStr,
+                    shareCode = shareCode
+                )
+            )
             activeSem.semesterId
         } else {
             dao.insertSemester(
                 SemesterEntity(
                     semesterName = semesterName,
-                    startDate = startDateStr,
-                    endDate = endDateStr,
+                    startDate = finalStartStr,
+                    endDate = finalEndStr,
                     shareCode = shareCode
                 )
             ).toInt()
@@ -144,17 +161,16 @@ object TimetableEngine {
         val cleanTemplates = templates.map { it.copy(templateId = 0, semesterId = semId) }
         dao.insertTemplates(cleanTemplates)
 
-        val startDate = LocalDate.parse(startDateStr, DateTimeFormatter.ISO_LOCAL_DATE)
-        val endDate = LocalDate.parse(endDateStr, DateTimeFormatter.ISO_LOCAL_DATE)
-        val effectiveStart = if (isRescanOverwrite && startDate.isBefore(LocalDate.now())) {
+        val endDateParsed = LocalDate.parse(finalEndStr, DateTimeFormatter.ISO_LOCAL_DATE)
+        val effectiveStart = if (isRescanOverwrite && safeStartDate.isBefore(LocalDate.now())) {
             LocalDate.now()
         } else {
-            startDate
+            safeStartDate
         }
 
         val generatedEvents = mutableListOf<ScheduleEvent>()
         var cursorDate = effectiveStart
-        while (!cursorDate.isAfter(endDate)) {
+        while (!cursorDate.isAfter(endDateParsed)) {
             val dayOfWeek = cursorDate.dayOfWeek.value
             val dateStr = cursorDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
@@ -181,8 +197,13 @@ object TimetableEngine {
     // 3. REVERT HOLIDAY FROM 7-DAY MASTER TEMPLATE
     suspend fun restoreHolidayFromTemplate(context: Context, targetDateStr: String) {
         val dao = AppDatabase.getDatabase(context).scheduleDao()
-        val activeSem = dao.getActiveSemester(targetDateStr) ?: return
-        val date = LocalDate.parse(targetDateStr, DateTimeFormatter.ISO_LOCAL_DATE)
+        val todayStr = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val activeSem = dao.getActiveSemester(todayStr) ?: return
+        val date = runCatching {
+            LocalDate.parse(targetDateStr, DateTimeFormatter.ISO_LOCAL_DATE)
+        }.getOrNull() ?: return
+
+        dao.deleteAllEventsOnDate(targetDateStr)
         val dayTemplates = dao.getTemplateForDay(activeSem.semesterId, date.dayOfWeek.value)
 
         val restored = dayTemplates.map { tmpl ->
@@ -256,7 +277,7 @@ object TimetableEngine {
                 )
             }
 
-            buildAndSaveSemester(context, semName, startStr, endStr, templates, isRescanOverwrite = false)
+            buildAndSaveSemester(context, semName, startStr, endStr, templates, isRescanOverwrite = true)
             true
         } catch (e: Exception) {
             false
